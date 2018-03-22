@@ -1,9 +1,9 @@
 # AHS
 The Address Handle Service (AHS) - A Simple ENS Alternative
 
-**Title**: Address Handle Service aka AHS
-**Author**: Ghilia Weldesselasie, founder of D-OZ and genius extraordinaire
-**Twitter**: [@ghiliweld](https://twitter.com/ghiliweld), my DMs are open so slide through if you trynna chat ;)
+- **Title**: Address Handle Service aka AHS
+- **Author**: Ghilia Weldesselasie, founder of D-OZ and genius extraordinaire
+- **Twitter**: [@ghiliweld](https://twitter.com/ghiliweld), my DMs are open so slide through if you trynna chat ;)
 
 This is a simple alternative to ENS I made cause ENS was too complicated
 for me to understand which seemed odd since it should be simple in my opinion.

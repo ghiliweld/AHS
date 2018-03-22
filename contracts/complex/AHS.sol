@@ -7,8 +7,6 @@ pragma solidity ^0.4.19;
 
 This is a simple alternative to ENS I made cause ENS was too complicated
 for me to understand which seemed odd since it should be simple in my opinion.
-
-Please donate if you like it, all the proceeds go towards funding D-OZ, my project.
 */
 
 contract AHS is Ownable {
@@ -19,11 +17,12 @@ contract AHS is Ownable {
     uint256 public daiPrice = 100; // price in DAI 100 DAI so 100 USD
 
     mapping (bytes32 => mapping (bytes32 => address)) public handleIndex;
+    mapping (bytes32 => bool) public ethHandleRegistred;
     mapping (bytes32 => bool) public baseRegistred;
     mapping (address => mapping (bytes32 => bool)) public ownsBase;
 
     event NewBase(bytes32 _base, address indexed _address);
-    event NewHandle(bytes32 _base, string _handle, address indexed _address);
+    event NewHandle(bytes32 _base, bytes32 _handle, address indexed _address);
     event BaseTransfered(bytes32 _base, address indexed _to);
 
     function AHS(bytes32 _ethBase, bytes32 _weldBase) public {
@@ -46,17 +45,19 @@ contract AHS is Ownable {
         NewBase(_base, msg.sender);
     }
 
-    function registerHandle(bytes32 _base, string _handle, address _addr) public {
+    function registerHandle(bytes32 _base, bytes32 _handle, address _addr) public {
         require(baseRegistred[_base]);
         require(_addr != address(0));
         require(ownsBase[msg.sender][_base]);
-        handleIndex[_base][keccak256(_handle)] = _addr;
+        handleIndex[_base][_handle] = _addr;
         NewHandle(_base, _handle, msg.sender);
     }
 
-    function registerEthHandle(string _handle, address _addr) public {
+    function registerEthHandle(bytes32 _handle, address _addr) public {
         require(_addr != address(0));
-        handleIndex[ethBase][keccak256(_handle)] = _addr;
+        require(!ethHandleRegistred[_handle]);
+        ethHandleRegistred[_handle] = true;
+        handleIndex[ethBase][_handle] = _addr;
         NewHandle(ethBase, _handle, msg.sender);
     }
 
@@ -80,12 +81,16 @@ contract AHS is Ownable {
         daiPrice = _daiPrice;
     }
 
-    function findAddress(bytes32 _base, string _handle) public view returns(address) {
-        return handleIndex[_base][keccak256(_handle)];
+    function findAddress(bytes32 _base, bytes32 _handle) public view returns(address) {
+        return handleIndex[_base][_handle];
     }
 
     function isRegistered(bytes32 _base) public view returns(bool) {
         return baseRegistred[_base];
+    }
+
+    function ethHandleIsRegistered(bytes32 _handle) public view returns(bool) {
+        return ethHandleRegistred[_handle];
     }
 
     function doesOwn(bytes32 _base, address _addr) public view returns(bool) {

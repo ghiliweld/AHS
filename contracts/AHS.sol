@@ -7,8 +7,6 @@ pragma solidity ^0.4.19;
 
 This is a simple alternative to ENS I made cause ENS was too complicated
 for me to understand which seemed odd since it should be simple in my opinion.
-
-Please donate if you like it, all the proceeds go towards funding D-OZ, my project.
 */
 
 contract AHS {

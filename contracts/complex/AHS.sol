@@ -39,7 +39,7 @@ contract AHS is Ownable {
         require(!baseRegistred[_base]);
         baseRegistred[_base] = true;
         ownsBase[msg.sender][_base] = true;
-        if (msg.value = 0 && dai.balanceOf(msg.sender) >= daiPrice) {
+        if (msg.value <= price && dai.balanceOf(msg.sender) >= daiPrice) {
             dai.transfer(owner, daiPrice);
         }
         NewBase(_base, msg.sender);

@@ -17,21 +17,12 @@ contract AHS is Ownable {
     uint256 public daiPrice = 100; // price in DAI 100 DAI so 100 USD
 
     mapping (bytes32 => mapping (bytes32 => address)) public handleIndex;
-    mapping (bytes32 => bool) public ethHandleRegistred;
     mapping (bytes32 => bool) public baseRegistred;
     mapping (address => mapping (bytes32 => bool)) public ownsBase;
 
     event NewBase(bytes32 _base, address indexed _address);
     event NewHandle(bytes32 _base, bytes32 _handle, address indexed _address);
     event BaseTransfered(bytes32 _base, address indexed _to);
-
-    function AHS(bytes32 _ethBase, bytes32 _weldBase) public {
-        ethBase = _ethBase;
-        baseRegistred[_ethBase] = true;
-        baseRegistred[_weldBase] = true;
-        ownsBase[msg.sender][_ethBase] = true;
-        ownsBase[msg.sender][_weldBase] = true;
-    }
 
     function registerBase(bytes32 _base) public payable {
         require(msg.value >= price || dai.balanceOf(msg.sender) >= daiPrice);
@@ -45,20 +36,12 @@ contract AHS is Ownable {
         NewBase(_base, msg.sender);
     }
 
-    function registerHandle(bytes32 _base, bytes32 _handle, address _addr) public {
+    function registerHandle(bytes32 _base, bytes32 _handle, address _addr) public payable {
         require(baseRegistred[_base]);
         require(_addr != address(0));
         require(ownsBase[msg.sender][_base]);
         handleIndex[_base][_handle] = _addr;
         NewHandle(_base, _handle, msg.sender);
-    }
-
-    function registerEthHandle(bytes32 _handle, address _addr) public {
-        require(_addr != address(0));
-        require(!ethHandleRegistred[_handle]);
-        ethHandleRegistred[_handle] = true;
-        handleIndex[ethBase][_handle] = _addr;
-        NewHandle(ethBase, _handle, msg.sender);
     }
 
     function transferBase(bytes32 _base, address _newAddress) public {

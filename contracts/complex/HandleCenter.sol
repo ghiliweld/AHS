@@ -4,12 +4,23 @@ pragma solidity ^0.4.19;
 
 contract HandleCenter is AHS, PHS {
 
-    function HandleCenter(bytes32 _ethBase, bytes32 _weldBase) public {
+    function HandleCenter(bytes32 _ethBase, bytes32 _weldBase, bytes32 _comBase, bytes32 _coBase, bytes32 _icoBase,
+bytes32 _netBase, bytes32 _ioBase) public {
         ethBase = _ethBase;
         baseRegistred[_ethBase] = true;
         baseRegistred[_weldBase] = true;
+        baseRegistred[_comBase] = true;
+        baseRegistred[_coBase] = true;
+        baseRegistred[_icoBase] = true;
+        baseRegistred[_netBase] = true;
+        baseRegistred[_ioBase] = true;
         ownsBase[msg.sender][_ethBase] = true;
         ownsBase[msg.sender][_weldBase] = true;
+        ownsBase[msg.sender][_comBase] = true;
+        ownsBase[msg.sender][_coBase] = true;
+        ownsBase[msg.sender][_icoBase] = true;
+        ownsBase[msg.sender][_netBase] = true;
+        ownsBase[msg.sender][_ioBase] = true;
     }
 
     function () public payable {} // donations are optional

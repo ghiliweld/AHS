@@ -13,5 +13,7 @@ interface AHSInterface {
     function withdraw() public;
     function findAddress(string _handle) public view returns(address);
     function isRegistered(string _handle) public view returns(bool);
+    function ethHandleIsRegistered(bytes32 _handle) public view returns(bool);
     function doesOwn(string _handle, address _addr) public view returns(bool);
+    function doesOwnEthHandle(bytes32 _handle, address _addr) public view returns(bool);
 }

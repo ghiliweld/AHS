@@ -3,7 +3,6 @@ pragma solidity ^0.4.19;
 
 contract HandleLogic is Ownable {
 
-    bytes32 public ethBase; // .eth extension
     uint256 public price; // price in Wei roughly 100 USD, might make free in near future
 
     mapping (bytes32 => mapping (bytes32 => address)) public handleIndex; // base => handle => address
@@ -38,11 +37,6 @@ contract HandleLogic is Ownable {
         ownsBase[msg.sender][_base] = false;
         ownsBase[_newAddress][_base] = true;
         BaseTransfered(_base, msg.sender);
-    }
-
-    // returns .eth bytes32
-    function getEthBase() public view returns(bytes32) {
-        return ethBase;
     }
 
     // returns price in wei

@@ -7,6 +7,7 @@ pragma solidity ^0.4.19;
 contract PHS is Ownable {
 
     AHSInterface public ahs;
+    bytes32 public ethBase; // .eth extension
 
     mapping (bytes32 => bool) public ethHandleRegistred;
     mapping (address => mapping (bytes32 => bool)) public ownsEthHandle;
@@ -14,14 +15,14 @@ contract PHS is Ownable {
 
     event HandleTransfered(bytes32 _handle, address indexed _to);
 
-    function PHS(AHSInterface _ahs, bytes32 _ghili) public {
+    function PHS(AHSInterface _ahs, bytes32 _ethBase, bytes32 _ghili) public {
         ahs = _ahs;
+        ethBase = _ethBase;
         registerEthHandle(_ghili, msg.sender);
     }
 
     function registerEthHandle(bytes32 _handle, address _addr) public payable {
         require(_addr != address(0));
-        bytes32 ethBase = ahs.getEthBase();
         if (ethHandleRegistred[_handle] && ownsEthHandle[msg.sender][_handle]) {
             ahs.registerHandle(ethBase, _handle, _addr);
         }
@@ -40,12 +41,15 @@ contract PHS is Ownable {
         ownsEthHandle[_addr][_handle] = true;
     }
 
+    function getEthBase() public view returns(bytes32) {
+        return ethBase;
+    }
+
     function ethHandleIsRegistered(bytes32 _handle) public view returns(bool) {
         return ethHandleRegistred[_handle];
     }
 
     function findAddress(bytes32 _handle) public view returns(address) {
-        bytes32 ethBase = ahs.getEthBase();
         address addr = ahs.findAddress(ethBase, _handle);
         assert(addr != address(0));
         return addr;
@@ -57,7 +61,6 @@ contract PHS is Ownable {
 
     function transferBaseOwnership() public {
         require(msg.sender == owner);
-        bytes32 ethBase = ahs.getEthBase();
         ahs.transferBase(ethBase, owner);
     }
 

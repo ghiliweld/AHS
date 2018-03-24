@@ -13,7 +13,6 @@ contract AHS is HandleLogic {
 
     function AHS(uint256 _price, bytes32 _ethBase, bytes32 _weldBase, bytes32 _comBase) public {
         price = _price;
-        ethBase = _ethBase;
         baseRegistred[_ethBase] = true;
         baseRegistred[_weldBase] = true;
         baseRegistred[_comBase] = true;

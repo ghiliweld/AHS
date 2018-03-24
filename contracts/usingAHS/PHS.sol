@@ -47,6 +47,7 @@ contract PHS is Ownable {
     function findAddress(bytes32 _handle) public view returns(address) {
         bytes32 ethBase = ahs.getEthBase();
         address addr = ahs.findAddress(ethBase, _handle);
+        assert(addr != address(0));
         return addr;
     }
 

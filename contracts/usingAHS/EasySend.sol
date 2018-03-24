@@ -20,6 +20,7 @@ contract EasySend is Ownable {
 
     function findAddress(bytes32 _base, bytes32 _handle) public view returns(address) {
         address addr = ahs.findAddress(_base, _handle);
+        assert(addr != address(0));
         return addr;
     }
 

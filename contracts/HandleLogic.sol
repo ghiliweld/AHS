@@ -5,9 +5,9 @@ contract HandleLogic is Ownable {
 
     uint256 public price; // price in Wei
 
-    mapping (bytes32 => mapping (bytes32 => address)) public handleIndex; // base => handle => address
+    mapping (bytes32 => address) public handleIndex; // hash of (base, handle) => address
     mapping (bytes32 => bool) public baseRegistred; // tracks if a base is registered or not
-    mapping (address => mapping (bytes32 => bool)) public ownsBase; // tracks who owns a base and returns a bool
+    mapping (bytes32 => address) public baseOwner; // tracks who owns a base
 
     event NewBase(bytes32 _base, address indexed _address);
     event NewHandle(bytes32 _base, bytes32 _handle, address indexed _address);
@@ -17,24 +17,23 @@ contract HandleLogic is Ownable {
         require(msg.value >= price); // you have to pay the price
         require(!baseRegistred[_base]); // the base can't already be registered
         baseRegistred[_base] = true; // registers base
-        ownsBase[msg.sender][_base] = true; // you now own the base
+        baseOwner[_base] = msg.sender; // you now own the base
         NewBase(_base, msg.sender);
     }
 
     function registerHandle(bytes32 _base, bytes32 _handle, address _addr) public {
         require(baseRegistred[_base]); // the base must exist
         require(_addr != address(0)); // no uninitialized addresses
-        require(ownsBase[msg.sender][_base]); // msg.sender must own the base
-        handleIndex[_base][_handle] = _addr; // an address gets tied to your AHS handle
+        require(msg.sender == baseOwner[_base]); // msg.sender must own the base
+        handleIndex[keccak256(_base, _handle)] = _addr; // an address gets tied to your AHS handle
         NewHandle(_base, _handle, msg.sender);
     }
 
     function transferBase(bytes32 _base, address _newAddress) public {
         require(baseRegistred[_base]); // the base must exist
         require(_newAddress != address(0)); // no uninitialized addresses
-        require(ownsBase[msg.sender][_base]); // .sender must own the base
-        ownsBase[msg.sender][_base] = false; // relinquish your ownership of the base...
-        ownsBase[_newAddress][_base] = true; // ... and give it to someone else
+        require(msg.sender == baseOwner[_base]); // .sender must own the base
+        ownsBase[_base] = _newAddress; // base gets transfered to new address
         BaseTransfered(_base, msg.sender);
     }
 
@@ -45,7 +44,7 @@ contract HandleLogic is Ownable {
 
     // search for an address in the handleIndex mapping
     function findAddress(bytes32 _base, bytes32 _handle) public view returns(address) {
-        return handleIndex[_base][_handle];
+        return handleIndex[keccak256(_base, _handle)];
     }
 
     // check if a base is registered
@@ -54,7 +53,7 @@ contract HandleLogic is Ownable {
     }
 
     // check if an address owns a base
-    function doesOwnBase(bytes32 _base, address _addr) public view returns(bool) {
-        return ownsBase[_addr][_base];
+    function getBaseOwner(bytes32 _base, address _addr) public view returns(address) {
+        return baseOwner[_base];
     }
 }

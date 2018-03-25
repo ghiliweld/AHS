@@ -1,65 +1,67 @@
 pragma solidity ^0.4.19;
 
-// Personal Handle Service PHS
-// A service on top of the AHS for registering your own handle on top of the .eth base for free
+// Registrar Service
+// An example of a service built on top of the AHS for registering your own handle on top of a base for
 // donations are optional
 
-contract PHS is Ownable {
+contract Registrar is Ownable {
 
     AHSInterface public ahs;
-    bytes32 public ethBase; // .eth extension
+    bytes32 public base;
+    uint256 public price; // owners can chose to charge for handle registration
 
-    mapping (bytes32 => bool) public ethHandleRegistred;
-    mapping (address => mapping (bytes32 => bool)) public ownsEthHandle;
+    mapping (bytes32 => bool) public handleRegistred;
+    mapping (bytes32 => address) public handleOwner; // tracks who owns a base
 
 
     event HandleTransfered(bytes32 _handle, address indexed _to);
 
-    function PHS(AHSInterface _ahs, bytes32 _ethBase) public {
+    function Registrar(AHSInterface _ahs, bytes32 _base, uint256 _price) public {
         ahs = _ahs;
-        ethBase = _ethBase;
+        base = _base;
+        price = _price;
     }
 
-    function registerEthHandle(bytes32 _handle, address _addr) public payable {
+    function registerHandle(bytes32 _handle, address _addr) public payable {
         require(_addr != address(0));
-        if (ethHandleRegistred[_handle] && ownsEthHandle[msg.sender][_handle]) {
-            ahs.registerHandle(ethBase, _handle, _addr);
+        if (handleRegistered[_handle] && msg.sender == handleOwner[_handle]) {
+            ahs.registerHandle(base, _handle, _addr);
         }
-        if (!ethHandleRegistred[_handle]) {
-            ethHandleRegistred[_handle] = true;
-            ownsEthHandle[msg.sender][_handle] = true;
-            ahs.registerHandle(ethBase, _handle, _addr);
+        if (!handleRegistered[_handle]) {
+            handleRegistered[_handle] = true;
+            handleOwner[_handle] = msg.sender;
+            ahs.registerHandle(base, _handle, _addr);
         } else {
             revert();
         }
     }
 
-    function transferEthHandleOwnership(bytes32 _handle, address _addr) public {
-        require(ownsEthHandle[msg.sender][_handle]);
-        ownsEthHandle[msg.sender][_handle] = false;
-        ownsEthHandle[_addr][_handle] = true;
+    function transferHandleOwnership(bytes32 _handle, address _addr) public {
+        require(msg.sender == handleOwner[_handle]);
+        handleOwner[_handle] = _addr;
+        HandleTransfered(_handle, _addr);
     }
 
-    function getEthBase() public view returns(bytes32) {
-        return ethBase;
+    function getBase() public view returns(bytes32) {
+        return base;
     }
 
-    function ethHandleIsRegistered(bytes32 _handle) public view returns(bool) {
-        return ethHandleRegistred[_handle];
+    function handleIsRegistered(bytes32 _handle) public view returns(bool) {
+        return handleRegistered[_handle];
     }
 
     function findAddress(bytes32 _handle) public view returns(address) {
-        address addr = ahs.findAddress(ethBase, _handle);
+        address addr = ahs.findAddress(base, _handle);
         return addr;
     }
 
-    function doesOwnEthHandle(bytes32 _handle, address _addr) public view returns(bool) {
-        return ownsEthHandle[_addr][_handle];
+    function getHandleOwner(bytes32 _handle) public view returns(address) {
+        return handleOwner[_handle];
     }
 
     function transferBaseOwnership() public {
         require(msg.sender == owner);
-        ahs.transferBase(ethBase, owner);
+        ahs.transferBase(base, owner);
     }
 
     function withdraw() public {

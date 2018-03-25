@@ -3,7 +3,7 @@ pragma solidity ^0.4.19;
 
 contract HandleLogic is Ownable {
 
-    uint256 public price; // price in Wei roughly 100 USD, might make free in near future
+    uint256 public price; // price in Wei
 
     mapping (bytes32 => mapping (bytes32 => address)) public handleIndex; // base => handle => address
     mapping (bytes32 => bool) public baseRegistred; // tracks if a base is registered or not
@@ -37,11 +37,6 @@ contract HandleLogic is Ownable {
         ownsBase[msg.sender][_base] = false;
         ownsBase[_newAddress][_base] = true;
         BaseTransfered(_base, msg.sender);
-    }
-
-    // returns price in wei
-    function getPrice() public view returns(uint256) {
-        return price;
     }
 
     // search for an address in the handleIndex mapping

@@ -15,10 +15,9 @@ contract PHS is Ownable {
 
     event HandleTransfered(bytes32 _handle, address indexed _to);
 
-    function PHS(AHSInterface _ahs, bytes32 _ethBase, bytes32 _ghili) public {
+    function PHS(AHSInterface _ahs, bytes32 _ethBase) public {
         ahs = _ahs;
         ethBase = _ethBase;
-        registerEthHandle(_ghili, msg.sender);
     }
 
     function registerEthHandle(bytes32 _handle, address _addr) public payable {
@@ -51,7 +50,6 @@ contract PHS is Ownable {
 
     function findAddress(bytes32 _handle) public view returns(address) {
         address addr = ahs.findAddress(ethBase, _handle);
-        assert(addr != address(0));
         return addr;
     }
 

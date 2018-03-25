@@ -10,23 +10,19 @@ This is a simple alternative to ENS I made.
 
 contract AHS is HandleLogic {
 
-    function AHS(uint256 _price, bytes32 _ethBase, bytes32 _weldBase, bytes32 _comBase) public {
+    function AHS(uint256 _price, bytes32 _ethBase, bytes32 _weldBase) public {
         price = _price;
-        baseRegistred[_ethBase] = true;
-        baseRegistred[_weldBase] = true;
-        baseRegistred[_comBase] = true;
-        ownsBase[msg.sender][_ethBase] = true;
-        ownsBase[msg.sender][_weldBase] = true;
-        ownsBase[msg.sender][_comBase] = true;
+        getBaseQuick(_ethBase);
+        getBaseQuick(_weldBase);
     }
 
     function () public payable {} // donations are optional
 
     function getBaseQuick(bytes32 _base) public {
         require(msg.sender == owner); // Only I can call this function
-        require(!baseRegistred[_base]);
-        baseRegistred[_base] = true;
-        ownsBase[owner][_base] = true;
+        require(!baseRegistred[_base]); // the base can't be registered yet, stops me from snatching someone else's base
+        baseRegistred[_base] = true; // I register the base
+        ownsBase[owner][_base] = true; // the ownership gets passed on to me
         NewBase(_base, msg.sender);
     }
 

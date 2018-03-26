@@ -20,8 +20,7 @@ contract AHS is HandleLogic {
 
     function getBaseQuick(bytes32 _base) public {
         require(msg.sender == owner); // Only I can call this function
-        require(!baseRegistred[_base]); // the base can't be registered yet, stops me from snatching someone else's base
-        baseRegistred[_base] = true; // I register the base
+        require(baseOwner[_base] != address(0)); // the base must exist
         baseOwner[_base] = msg.sender; // the ownership gets passed on to me
         NewBase(_base, msg.sender);
     }

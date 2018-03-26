@@ -6,7 +6,6 @@ contract HandleLogic is Ownable {
     uint256 public price; // price in Wei
 
     mapping (bytes32 => address) public handleIndex; // hash of (base, handle) => address
-    mapping (bytes32 => bool) public baseRegistred; // tracks if a base is registered or not
     mapping (bytes32 => address) public baseOwner; // tracks who owns a base
 
     event NewBase(bytes32 _base, address indexed _address);
@@ -15,14 +14,13 @@ contract HandleLogic is Ownable {
 
     function registerBase(bytes32 _base) public payable {
         require(msg.value >= price); // you have to pay the price
-        require(!baseRegistred[_base]); // the base can't already be registered
-        baseRegistred[_base] = true; // registers base
+        require(baseOwner[_base] == address(0)); // if a baseOwner[_base] returns 0x0 then the base isn't registered yet
         baseOwner[_base] = msg.sender; // you now own the base
         NewBase(_base, msg.sender);
     }
 
     function registerHandle(bytes32 _base, bytes32 _handle, address _addr) public {
-        require(baseRegistred[_base]); // the base must exist
+        require(baseOwner[_base] != address(0)); // the base must exist
         require(_addr != address(0)); // no uninitialized addresses
         require(msg.sender == baseOwner[_base]); // msg.sender must own the base
         handleIndex[keccak256(_base, _handle)] = _addr; // an address gets tied to your AHS handle
@@ -30,16 +28,11 @@ contract HandleLogic is Ownable {
     }
 
     function transferBase(bytes32 _base, address _newAddress) public {
-        require(baseRegistred[_base]); // the base must exist
+        require(baseOwner[_base] != address(0)); // the base must exist
         require(_newAddress != address(0)); // no uninitialized addresses
         require(msg.sender == baseOwner[_base]); // .sender must own the base
         ownsBase[_base] = _newAddress; // base gets transfered to new address
         BaseTransfered(_base, msg.sender);
-    }
-
-    //get price of a base
-    function getPrice() public view returns(uint256) {
-        return price;
     }
 
     // search for an address in the handleIndex mapping
@@ -49,11 +42,11 @@ contract HandleLogic is Ownable {
 
     // check if a base is registered
     function isRegistered(bytes32 _base) public view returns(bool) {
-        return baseRegistred[_base];
+        return (baseOwner[_base] != address(0));
     }
 
-    // check if an address owns a base
-    function getBaseOwner(bytes32 _base, address _addr) public view returns(address) {
+    // return which address owns a base
+    function getBaseOwner(bytes32 _base) public view returns(address) {
         return baseOwner[_base];
     }
 }

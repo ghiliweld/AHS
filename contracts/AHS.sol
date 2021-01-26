@@ -2,7 +2,7 @@ pragma solidity ^0.4.19;
 
 /*
 @title Address Handle Service aka AHS
-@author Ghilia Weldesselasie, founder of D-OZ and genius extraordinaire
+@author Ghilia Weldesselasie
 @twitter: @ghiliweld, my DMs are open so slide through if you trynna chat ;)
 
 This is a simple alternative to ENS I made.
